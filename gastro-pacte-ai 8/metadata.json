@@ -1,0 +1,7 @@
+{
+  "name": "Gastro-Pacte AI",
+  "description": "Assistant médical intelligent pour la gastro-entérologie avec chatbot tunisien, pré-consultation et dictaphone médecin.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
