@@ -321,7 +321,7 @@ export default function App() {
         if (event.data.size > 0) audioChunksRef.current.push(event.data);
       };
 
-      mediaRecorder.start();
+      mediaRecorder.start(1000);
       setIsRecording(true);
     } catch (err) {
       console.error("Error accessing microphone:", err);
@@ -335,6 +335,13 @@ export default function App() {
     mediaRecorderRef.current.onstop = async () => {
       const audioBlob = new Blob(audioChunksRef.current, { type: recordingMimeType });
       setIsRecording(false);
+
+      if (audioBlob.size === 0) {
+        setAudioTranscription("Erreur : L'enregistrement est vide. Veuillez vérifier votre microphone et réessayer.");
+        mediaRecorderRef.current?.stream.getTracks().forEach(track => track.stop());
+        return;
+      }
+
       setIsTranscribing(true);
       
       try {
@@ -343,18 +350,23 @@ export default function App() {
         
         const response = await ai.models.generateContent({
           model: MODEL_AUDIO,
-          contents: {
-            parts: [
-              { inlineData: { mimeType: recordingMimeType, data: base64Audio } },
-              { text: DOCTOR_TRANSCRIPTION_PROMPT }
-            ]
-          }
+          contents: [
+            { inlineData: { mimeType: recordingMimeType, data: base64Audio } },
+            { text: DOCTOR_TRANSCRIPTION_PROMPT }
+          ],
         });
 
-        setAudioTranscription(response.text || "Transcription vide.");
+        setAudioTranscription(response.text || "Transcription vide — l'audio ne contenait pas de parole détectable.");
       } catch (error) {
-        console.error(error);
-        setAudioTranscription("Erreur transcription.");
+        console.error("Erreur transcription audio:", error);
+        const message = error instanceof Error ? error.message : String(error);
+        if (message.includes('API key') || message.includes('401') || message.includes('403')) {
+          setAudioTranscription("Erreur d'authentification : Vérifiez votre clé API Gemini dans .env.local.");
+        } else if (message.includes('network') || message.includes('fetch') || message.includes('Failed to fetch')) {
+          setAudioTranscription("Erreur réseau : Impossible de contacter l'API Gemini. Vérifiez votre connexion.");
+        } else {
+          setAudioTranscription(`Erreur de transcription : ${message}`);
+        }
       } finally {
         setIsTranscribing(false);
         mediaRecorderRef.current?.stream.getTracks().forEach(track => track.stop());
