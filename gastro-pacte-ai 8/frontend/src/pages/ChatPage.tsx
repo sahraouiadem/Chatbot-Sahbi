@@ -1,43 +1,43 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageCircle, Loader2, Send, AlertCircle, Search, Sparkles } from 'lucide-react';
 import { ChatMessage } from '../types';
-import { sendChatMessage, validateApiKeyHealth } from '../../../backend/services/aiService';
+import { sendChatMessage, validateApiKeyHealth } from '../services/aiService';
 import Button from '../components/Button';
 
 const QUICK_QUESTIONS = [
-  "3andi wji3a fel karsha, chnowa n3mel?",
-  "3andi 7moriya w 7ar9an, khatar9ech?",
-  "3andi ishal mel 3 eyem, wa9tech nemchi lil tebib?",
-  "Bdit ma nakol, chnowa biya?",
+  'عندي وجيعة في كرشي، شنوّا نعمل؟',
+  'عندي حموضة وحرقة، خطيرة ولا لا؟',
+  'عندي إسهال من ثلاثة أيام، وقتاش نمشي للطبيب؟',
+  'بديت ما ناكلش، شنوّا بيا؟',
 ];
 
 const FAQ_ITEMS = [
   {
-    question: 'Chnowa najm na7ki m3a l-assistant?',
+    question: 'شنوّا نجم نحكي مع الأسيستان؟',
     answer:
-      'Tnajem t7ki 3la l-a3rath mte3ek b tounsi: wji3a, ishal, 7ar9an, ghathyan... w howa y3tik tawjih awwali.',
+      'تنجم تحكي على الأعراض متاعك بالتونسي: وجيعة، إسهال، حرقة، غثيان... وهو يعطيك توجيه أوّلي.',
   },
   {
-    question: 'Ki y9olli lezmek tebib, chnawa na3mel?',
+    question: 'كي يقلي يلزمك طبيب، شنوّا نعمل؟',
     answer:
-      'Ila l-a3rath yebdou mouch aadiyin, l-assistant ynajjem ynas7ek b visite médicale w y7addherlek l-ma3loumet el mohema.',
+      'إلا الأعراض يبدوا موش عاديين، الأسيستان ينجم ينصحك بزيارة طبية ويحضرلك المعلومات المهمّة.',
   },
   {
-    question: 'El ma3loumet mte3i mahfoutha?',
+    question: 'المعلومات متاعي محفوظة؟',
     answer:
-      'Naamlou usage lel ma3loumet bch n3awnouk fel suivi. Mat3tich ma3loumet 7assessa barcha fel chat.',
+      'نستعملوا المعلومات باش نعاونوك في المتابعة. ما تعطيش معلومات حسّاسة برشة في الشات.',
   },
   {
-    question: 'Najem nse2el sou2el direct men l-page loula?',
+    question: 'نجم نسأل سؤال مباشر من الصفحة اللولة؟',
     answer:
-      'Ey, ekteb sou2lek fel barre de recherche louta, w tebdé session chatbot direct.',
+      'إي، اكتب سؤالك في خانة البحث لتحت، وتبدا جلسة الشات بوت مباشرة.',
   },
 ];
 
 const ChatPage: React.FC = () => {
   const [chatInput, setChatInput] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([
-    { role: 'model', text: "3aslema! Labes 3lik? Ena l'assistant mte3ek. Chnowa t7ess lyoum?" },
+    { role: 'model', text: 'عالسلامة! لباس عليك؟ أنا الأسيستان متاعك. شنوّا تحسّ اليوم؟' },
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const [landingQuery, setLandingQuery] = useState('');
@@ -101,8 +101,8 @@ const ChatPage: React.FC = () => {
       {/* Header */}
       <div className="bg-teal-600 p-4 text-white shadow-sm flex items-center justify-between">
         <div>
-          <h2 className="font-bold text-lg">Assistant PACTE</h2>
-          <p className="text-teal-100 text-xs">Support en Dialecte Tunisien</p>
+          <h2 className="font-bold text-lg">مساعد باكت</h2>
+          <p className="text-teal-100 text-xs">دعم باللهجة التونسية</p>
         </div>
         <div className="flex items-center gap-2">
           <Button
@@ -112,7 +112,7 @@ const ChatPage: React.FC = () => {
             className="text-xs px-3 py-1.5"
           >
             {isCheckingApi ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
-            Tester API
+            اختبر الـ API
           </Button>
           <MessageCircle className="w-5 h-5 opacity-80" />
         </div>
@@ -129,24 +129,24 @@ const ChatPage: React.FC = () => {
       {/* Main Content Area */}
       {!hasUserSpoken ? (
         <div className="flex-1 overflow-y-auto bg-gradient-to-b from-teal-50 via-emerald-50 to-white p-6 md:p-8">
-          <div className="max-w-5xl mx-auto">
-            <div className="bg-white border border-teal-100 rounded-3xl p-6 md:p-8 shadow-lg">
+            <div className="max-w-5xl mx-auto" dir="rtl">
+              <div className="bg-white border border-teal-100 rounded-3xl p-6 md:p-8 shadow-lg">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-12 h-12 bg-teal-100 rounded-2xl flex items-center justify-center border border-teal-200">
                   <MessageCircle className="w-6 h-6 text-teal-700" />
                 </div>
                 <div>
-                  <p className="text-xs uppercase tracking-widest text-teal-600">PACTE Chatbot</p>
-                  <h3 className="text-xl md:text-2xl font-bold text-slate-900">Assistant Gastro en dialecte tunisien</h3>
+                  <p className="text-xs tracking-widest text-teal-600">شات بوت باكت</p>
+                  <h3 className="text-xl md:text-2xl font-bold text-slate-900">مساعد الجهاز الهضمي باللهجة التونسية</h3>
                 </div>
               </div>
 
               <p className="text-slate-700 leading-relaxed mb-6">
-                Mar7bé bik! Tnajem tse2el 3la a3rath, tekteb sou2lek direct, wala tabda b wa7ed men les questions fréquentes.
+                مرحبا بيك! تنجم تسأل على الأعراض، تكتب سؤالك مباشرة، ولا تبدا بواحد من الأسئلة المتداولة.
               </p>
 
               <div className="bg-teal-50 border border-teal-100 rounded-2xl p-3 md:p-4 mb-7">
-                <p className="text-sm text-teal-900 mb-2">Sou2el direct:</p>
+                <p className="text-sm text-teal-900 mb-2">سؤال مباشر:</p>
                 <div className="flex flex-col sm:flex-row gap-2">
                   <div className="relative flex-1">
                     <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-teal-500" />
@@ -155,7 +155,7 @@ const ChatPage: React.FC = () => {
                       value={landingQuery}
                       onChange={(e) => setLandingQuery(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleLandingSearch()}
-                      placeholder="Ex: 3andi wji3a fel karsha ba3d l-mekla..."
+                      placeholder="مثال: عندي وجيعة في كرشي بعد الماكلة..."
                       className="w-full pl-9 pr-4 py-3 rounded-xl bg-white border border-teal-200 text-slate-900 placeholder-slate-400 outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
                     />
                   </div>
@@ -165,14 +165,14 @@ const ChatPage: React.FC = () => {
                     className="rounded-xl px-5 min-h-[48px]"
                   >
                     <Sparkles className="w-4 h-4" />
-                    Démarrer chat
+                    ابدا الشات
                   </Button>
                 </div>
               </div>
 
               <div className="mb-3 flex items-center gap-2 text-sm text-teal-700">
                 <Sparkles className="w-4 h-4" />
-                Questions / réponses fréquentes
+                أسئلة وأجوبة متداولة
               </div>
               <div className="grid md:grid-cols-2 gap-4 mb-7">
                 {FAQ_ITEMS.map((faq) => (
@@ -186,7 +186,7 @@ const ChatPage: React.FC = () => {
                 ))}
               </div>
 
-              <div className="mb-3 text-sm text-slate-600">Ou essaie rapidement:</div>
+              <div className="mb-3 text-sm text-slate-600">ولا جرّب بسرعة:</div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 {QUICK_QUESTIONS.map((q, idx) => (
                   <button
@@ -209,8 +209,8 @@ const ChatPage: React.FC = () => {
           <div className="flex justify-start">
             <div className="bg-white border border-slate-200 text-slate-800 rounded-2xl rounded-bl-none px-4 py-3 shadow-sm max-w-[80%]">
               <p className="leading-relaxed">
-                3aslema! Ena l'assistant mta3ek. Si 3andek wji3a wala 9ala9, a7kili.
-                Si lezem temchi l'tabib, n9ollek t3ammer formulaire bech t7adher dossier mte3ek.
+                عالسلامة! أنا الأسيستان متاعك. كان عندك وجيعة ولا قلق، أحكيلي.
+                كان يلزم تمشي للطبيب، نقلك تعمّر الفورميلار باش تحضّر دوسي متاعك.
               </p>
             </div>
           </div>
@@ -235,7 +235,7 @@ const ChatPage: React.FC = () => {
             <div className="flex justify-start">
               <div className="bg-white border border-slate-200 rounded-2xl rounded-bl-none px-4 py-3 shadow-sm flex items-center gap-2">
                 <Loader2 className="w-4 h-4 animate-spin text-teal-600" />
-                <span className="text-slate-400 text-sm">Yekteb...</span>
+                <span className="text-slate-400 text-sm">يكتب...</span>
               </div>
             </div>
           )}
@@ -251,7 +251,7 @@ const ChatPage: React.FC = () => {
             value={chatInput}
             onChange={(e) => setChatInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-            placeholder={!hasUserSpoken ? "Akteb houni..." : "Ahki m3aya houni..."}
+            placeholder={!hasUserSpoken ? 'اكتب هوني...' : 'احكي معايا هوني...'}
             className={`flex-1 px-4 py-3 rounded-xl focus:ring-2 focus:ring-teal-500 transition-all outline-none ${
               !hasUserSpoken 
                 ? 'bg-white border border-teal-200 text-slate-900 placeholder-slate-400 focus:bg-white' 

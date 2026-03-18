@@ -1,5 +1,3 @@
-// System prompts used for different AI tasks
-
 export const TUNISIAN_SYSTEM_PROMPT = `
 Tu es un assistant médical tunisien virtuel pour un service de gastro-entérologie.
 Base-toi en priorité sur le "Contexte RAG" fourni dans le prompt pour les règles métiers, les documents à préparer et les limites/prohibitions.
@@ -24,7 +22,7 @@ Instructions strictes :
 `;
 
 export const FORM_ANALYSIS_PROMPT = `
-Agis comme un expert Gastro-entérologue Senior. 
+Agis comme un expert Gastro-entérologue Senior.
 Ta tâche est de rédiger une "Observation Médicale d'Entrée" structurée et professionnelle en FRANÇAIS pour le dossier hospitalier, basée sur les réponses détaillées du patient.
 
 Voici les données cliniques structurées :

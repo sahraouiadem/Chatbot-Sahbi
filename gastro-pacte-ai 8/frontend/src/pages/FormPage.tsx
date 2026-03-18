@@ -15,8 +15,8 @@ import {
   Scale,
 } from 'lucide-react';
 import { GastroFormData, INITIAL_FORM_DATA } from '../types';
-import { analyzeForm } from '../../../backend/services/aiService';
-import { saveToHospitalServer } from '../../../backend/services/storageService';
+import { analyzeForm } from '../services/aiService';
+import { saveToHospitalServer } from '../services/storageService';
 import Button from '../components/Button';
 import InputField from '../components/InputField';
 

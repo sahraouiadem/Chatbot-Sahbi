@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Mic, Loader2, PlayCircle, StopCircle, Download } from 'lucide-react';
-import { transcribeAudio } from '../../../backend/services/aiService';
+import { transcribeAudio } from '../services/aiService';
 
 const blobToBase64 = (blob: Blob): Promise<string> =>
   new Promise((resolve, reject) => {
