@@ -5,6 +5,7 @@ import {
   DOCTOR_TRANSCRIPTION_PROMPT,
   FORM_ANALYSIS_PROMPT,
 } from "../constants/prompts";
+import { retrieveGuidelineContext } from "./ragService";
 import { ChatMessage, GastroFormData } from "../../frontend/src/types";
 
 // --- AI Client Factory ---
@@ -21,7 +22,18 @@ export const sendChatMessage = async (
     .map((m) => `${m.role === "user" ? "Patient" : "Assistant"}: ${m.text}`)
     .join("\n");
 
-  const prompt = `${TUNISIAN_SYSTEM_PROMPT}\n\nHistorique de la conversation:\n${historyText}\n\nPatient: ${userText}\nAssistant:`;
+  const ragContext = retrieveGuidelineContext(`${historyText}\n${userText}`);
+
+  const prompt = `${TUNISIAN_SYSTEM_PROMPT}
+
+Contexte RAG (source de vérité des guidelines):
+${ragContext}
+
+Historique de la conversation:
+${historyText}
+
+Patient: ${userText}
+Assistant:`;
 
   const response: GenerateContentResponse = await ai.models.generateContent({
     model: MODEL_CHAT,
