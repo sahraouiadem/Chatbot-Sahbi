@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageCircle, Loader2, Send, AlertCircle, Search, Sparkles } from 'lucide-react';
 import { ChatMessage } from '../types';
-import { sendChatMessage } from '../../../backend/services/aiService';
+import { sendChatMessage, validateApiKeyHealth } from '../../../backend/services/aiService';
 import Button from '../components/Button';
 
 const QUICK_QUESTIONS = [
@@ -41,6 +41,8 @@ const ChatPage: React.FC = () => {
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const [landingQuery, setLandingQuery] = useState('');
+  const [isCheckingApi, setIsCheckingApi] = useState(false);
+  const [apiStatus, setApiStatus] = useState<{ ok: boolean; message: string } | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // If a user message exists, the chat has fully started
@@ -63,9 +65,11 @@ const ChatPage: React.FC = () => {
       setMessages((prev) => [...prev, { role: 'model', text: reply }]);
     } catch (error) {
       console.error(error);
+
+      const message = error instanceof Error ? error.message : 'Erreur de connexion. Vérifiez votre clé API.';
       setMessages((prev) => [
         ...prev,
-        { role: 'model', text: 'Erreur de connexion. Vérifiez votre clé API.', isError: true },
+        { role: 'model', text: message, isError: true },
       ]);
     } finally {
       setIsLoading(false);
@@ -79,6 +83,19 @@ const ChatPage: React.FC = () => {
     void handleSendMessage(query);
   };
 
+  const handleApiCheck = async () => {
+    setIsCheckingApi(true);
+    try {
+      const result = await validateApiKeyHealth();
+      setApiStatus(result);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Test API échoué.';
+      setApiStatus({ ok: false, message });
+    } finally {
+      setIsCheckingApi(false);
+    }
+  };
+
   return (
     <div className="flex flex-col h-full w-full bg-white overflow-hidden">
       {/* Header */}
@@ -87,8 +104,27 @@ const ChatPage: React.FC = () => {
           <h2 className="font-bold text-lg">Assistant PACTE</h2>
           <p className="text-teal-100 text-xs">Support en Dialecte Tunisien</p>
         </div>
-        <MessageCircle className="w-5 h-5 opacity-80" />
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={handleApiCheck}
+            disabled={isCheckingApi}
+            variant="secondary"
+            className="text-xs px-3 py-1.5"
+          >
+            {isCheckingApi ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
+            Tester API
+          </Button>
+          <MessageCircle className="w-5 h-5 opacity-80" />
+        </div>
       </div>
+
+      {apiStatus && (
+        <div
+          className={`px-4 py-2 text-sm border-b ${apiStatus.ok ? 'bg-green-50 text-green-700 border-green-100' : 'bg-red-50 text-red-700 border-red-100'}`}
+        >
+          {apiStatus.message}
+        </div>
+      )}
 
       {/* Main Content Area */}
       {!hasUserSpoken ? (
