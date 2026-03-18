@@ -15,25 +15,25 @@ export interface GastroFormData {
   fullName: string;
   age: string;
   gender: string;
-  
+
   // Chief Complaint
   motif: string;
   duration: string;
-  
-  // Pain Specifics (New)
+
+  // Pain Specifics
   painIntensity: string; // 1-10
-  painType: string; // Brûlure, Crampe, Torsion
-  painTrigger: string; // À jeun, Après repas, La nuit
-  
-  // Digestive Signs (Expanded)
-  transit: string; // Diarrhée, Constipation, Alternance
-  stoolColor: string; // Noir, Rouge, Glaireux, Normal
-  upperDigestive: string; // Vomissements, Difficulté à avaler (Dysphagie), Pyrosis
-  
+  painType: string;      // Brûlure, Crampe, Torsion
+  painTrigger: string;   // À jeun, Après repas, La nuit
+
+  // Digestive Signs
+  transit: string;        // Diarrhée, Constipation, Alternance
+  stoolColor: string;     // Noir, Rouge, Glaireux, Normal
+  upperDigestive: string; // Vomissements, Dysphagie, Pyrosis
+
   // General Signs
-  weightLoss: string; // Kg perdus / Durée
-  fever: string; // Température, Frissons
-  
+  weightLoss: string;  // Kg perdus / Durée
+  fever: string;       // Température, Frissons
+
   // Context
   history: string;
   familyHistory: string;
@@ -58,5 +58,5 @@ export const INITIAL_FORM_DATA: GastroFormData = {
   history: '',
   familyHistory: '',
   meds: '',
-  diet: ''
+  diet: '',
 };
