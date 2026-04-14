@@ -1,0 +1,11 @@
+services:
+  frontend:
+    container_name: gastro-pacte-frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+    ports:
+      - "3000:80"
+    restart: unless-stopped

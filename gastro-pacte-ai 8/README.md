@@ -56,3 +56,35 @@ Create `frontend/.env.local`:
 ```
 GEMINI_API_KEY=your_gemini_api_key_here
 ```
+
+## Docker
+
+The repository can be run in Docker using a production-grade frontend image (multi-stage build + nginx).
+
+### 1) Set environment variable for build-time injection
+
+Create a `.env` file at the repository root (next to `docker-compose.yml`) or export the variable in your shell:
+
+```bash
+cp .env.example .env
+# then edit .env and set GEMINI_API_KEY
+```
+
+### 2) Build and start
+
+```bash
+docker compose up --build -d
+```
+
+App URL:
+- `http://localhost:3000`
+
+### 3) Stop
+
+```bash
+docker compose down
+```
+
+### Notes
+- The current `backend/` folder is a service layer and does not expose an HTTP server yet, so only the frontend service is containerized at this stage.
+- The Gemini key is currently consumed at **frontend build time** (Vite env behavior).
