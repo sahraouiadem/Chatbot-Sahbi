@@ -6,7 +6,7 @@ import {
   FORM_ANALYSIS_PROMPT,
 } from "../constants/prompts";
 import { retrieveGuidelineContext } from "./ragService";
-import { ChatMessage, GastroFormData } from "../../frontend/src/types";
+import { ChatMessage, GastroFormData } from "../types";
 
 // --- AI Client Factory ---
 const resolveApiKey = (): string => {

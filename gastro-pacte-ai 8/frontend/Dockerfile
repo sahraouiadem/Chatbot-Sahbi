@@ -10,7 +10,7 @@ RUN npm ci
 COPY . .
 
 # Vite consumes VITE_* at build time.
-ARG VITE_GEMINI_API_KEY=
+ARG VITE_GEMINI_API_KEY=AIzaSyDX7PUoXqC-ftaDEnYfNMnXPCulClt_Iwk
 ENV VITE_GEMINI_API_KEY=${VITE_GEMINI_API_KEY}
 
 RUN npm run build

@@ -1,4 +1,4 @@
-import knowledgeBaseText from '../../frontend/src/knowledge/chatbot-guidelines.txt?raw';
+import knowledgeBaseText from '../knowledge/chatbot-guidelines.txt?raw';
 
 interface ChunkScore {
   chunk: string;

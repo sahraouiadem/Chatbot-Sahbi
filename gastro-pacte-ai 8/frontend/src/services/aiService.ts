@@ -1,107 +1,17 @@
-import { GoogleGenAI, GenerateContentResponse } from '@google/genai';
+import { GenerateContentResponse } from '@google/genai';
 import { MODEL_CHAT, MODEL_ANALYSIS, MODEL_AUDIO } from '../constants/models';
 import {
-  TUNISIAN_SYSTEM_PROMPT,
   DOCTOR_TRANSCRIPTION_PROMPT,
   FORM_ANALYSIS_PROMPT,
 } from '../constants/prompts';
-import { retrieveGuidelineContext } from './ragService';
 import { ChatMessage, GastroFormData } from '../types';
-
-const resolveApiKey = (): string => {
-  const injectedProcessApiKey =
-    typeof process !== 'undefined'
-      ? process.env.GEMINI_API_KEY || process.env.API_KEY || ''
-      : '';
-
-  const key =
-    import.meta.env.VITE_GEMINI_API_KEY ||
-    import.meta.env.GEMINI_API_KEY ||
-    injectedProcessApiKey ||
-    '';
-
-  if (!key.trim()) {
-    throw new Error(
-      'Clé API Gemini introuvable. Définis VITE_GEMINI_API_KEY (ou GEMINI_API_KEY) dans frontend/.env.local puis redémarre le serveur Vite.'
-    );
-  }
-
-  return key;
-};
-
-const extractErrorMessage = (error: unknown): string => {
-  const simplifyProviderMessage = (raw: string): string => {
-    const lowered = raw.toLowerCase();
-
-    if (lowered.includes('api key expired') || lowered.includes('api_key_invalid')) {
-      return 'Clé API Gemini expirée ou invalide. Génère une nouvelle clé dans Google AI Studio, remplace-la dans frontend/.env.local, puis redémarre `npm run dev`.';
-    }
-
-    if (lowered.includes('quota') || lowered.includes('rate') || lowered.includes('resource_exhausted')) {
-      return 'Quota API atteint. Vérifie la facturation/limites du projet Google AI puis réessaie.';
-    }
-
-    if (raw.trim().startsWith('{')) {
-      try {
-        const parsed = JSON.parse(raw) as { error?: { message?: string } };
-        const providerMessage = parsed.error?.message;
-        if (providerMessage && providerMessage.trim()) {
-          return simplifyProviderMessage(providerMessage);
-        }
-      } catch {
-        return raw;
-      }
-    }
-
-    return raw;
-  };
-
-  if (error instanceof Error && error.message.trim()) {
-    return simplifyProviderMessage(error.message);
-  }
-
-  return 'Erreur AI inconnue';
-};
-
-const getAiClient = () => new GoogleGenAI({ apiKey: resolveApiKey() });
-
-const ARABIC_SCRIPT_REPLY_REGEX =
-  /^[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\s\n\r.,;:!?،؛؟()\-"'«»…]+$/u;
-
-const isArabicScriptReply = (text: string): boolean => {
-  const normalized = text.trim();
-  return normalized.length > 0 && ARABIC_SCRIPT_REPLY_REGEX.test(normalized);
-};
-
-const enforceArabicScriptReply = async (ai: GoogleGenAI, rawReply: string): Promise<string> => {
-  if (isArabicScriptReply(rawReply)) {
-    return rawReply;
-  }
-
-  const rewritePrompt = `حوّل النص التالي لنفس المعنى بالدارجة التونسية فقط وبالحروف العربية فقط.
-- ممنوع استعمال الحروف اللاتينية.
-- ممنوع استعمال أرقام الأرابيزي كيما 3 و7 و9.
-- رجّع غير النص النهائي بدون شرح.
-
-النص:
-${rawReply}`;
-
-  const rewriteResponse = await ai.models.generateContent({
-    model: MODEL_CHAT,
-    contents: rewritePrompt,
-  });
-
-  const rewritten = (rewriteResponse.text || '').trim();
-  if (isArabicScriptReply(rewritten)) {
-    return rewritten;
-  }
-
-  return rawReply;
-};
+import { createAiClient, extractErrorMessage } from './chatbot/aiClient';
+import { enforceArabicScriptReply } from './chatbot/replyPolicy';
+import { buildChatPrompt } from './chatbot/promptComposer';
 
 export const validateApiKeyHealth = async (): Promise<{ ok: boolean; message: string }> => {
   try {
-    const ai = getAiClient();
+    const ai = createAiClient();
 
     await ai.models.generateContent({
       model: MODEL_CHAT,
@@ -122,24 +32,8 @@ export const validateApiKeyHealth = async (): Promise<{ ok: boolean; message: st
 
 export const sendChatMessage = async (userText: string, history: ChatMessage[]): Promise<string> => {
   try {
-    const ai = getAiClient();
-    const historyText = history
-      .slice(-6)
-      .map((m) => `${m.role === 'user' ? 'Patient' : 'Assistant'}: ${m.text}`)
-      .join('\n');
-
-    const ragContext = retrieveGuidelineContext(`${historyText}\n${userText}`);
-
-    const prompt = `${TUNISIAN_SYSTEM_PROMPT}
-
-Contexte RAG (source de vérité des guidelines):
-${ragContext}
-
-Historique de la conversation:
-${historyText}
-
-Patient: ${userText}
-Assistant:`;
+    const ai = createAiClient();
+    const prompt = buildChatPrompt(userText, history);
 
     const response: GenerateContentResponse = await ai.models.generateContent({
       model: MODEL_CHAT,
@@ -159,7 +53,7 @@ Assistant:`;
 
 export const analyzeForm = async (formData: GastroFormData): Promise<string> => {
   try {
-    const ai = getAiClient();
+    const ai = createAiClient();
     const prompt = `${FORM_ANALYSIS_PROMPT}
   
   --- 1. IDENTITÉ ---
@@ -202,7 +96,7 @@ export const analyzeForm = async (formData: GastroFormData): Promise<string> => 
 
 export const transcribeAudio = async (base64Audio: string, mimeType: string): Promise<string> => {
   try {
-    const ai = getAiClient();
+    const ai = createAiClient();
 
     const response = await ai.models.generateContent({
       model: MODEL_AUDIO,

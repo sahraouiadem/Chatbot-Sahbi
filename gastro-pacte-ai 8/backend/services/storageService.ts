@@ -1,4 +1,4 @@
-import { GastroFormData } from "../../frontend/src/types";
+import { GastroFormData } from "../types";
 
 export interface MedicalRecord {
   recordId: string;

@@ -23,6 +23,11 @@ const FAQ_ITEMS = [
       'إلا الأعراض يبدوا موش عاديين، الأسيستان ينجم ينصحك بزيارة طبية ويحضرلك المعلومات المهمّة.',
   },
   {
+    question: 'شنوّا أهمّ وثايق لازم نجيبهم؟',
+    answer:
+      'الأهمّ: lettre de liaison، carte d’identité، و carnet CNAM. وكان عندك تحاليل ولا ordonnance جديدة، جيبهم زادة.',
+  },
+  {
     question: 'المعلومات متاعي محفوظة؟',
     answer:
       'نستعملوا المعلومات باش نعاونوك في المتابعة. ما تعطيش معلومات حسّاسة برشة في الشات.',
@@ -210,7 +215,7 @@ const ChatPage: React.FC = () => {
             <div className="bg-white border border-slate-200 text-slate-800 rounded-2xl rounded-bl-none px-4 py-3 shadow-sm max-w-[80%]">
               <p className="leading-relaxed">
                 عالسلامة! أنا الأسيستان متاعك. كان عندك وجيعة ولا قلق، أحكيلي.
-                كان يلزم تمشي للطبيب، نقلك تعمّر الفورميلار باش تحضّر دوسي متاعك.
+                نعطيك توجيه واضح حسب حالتك وخطواتك الجاية.
               </p>
             </div>
           </div>
